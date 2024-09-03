@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "130903759798",
+    "project_id": "cinefy-1a855",
+    "storage_bucket": "cinefy-1a855.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130903759798:android:02e782f680e06aa81e3f17",
+        "android_client_info": {
+          "package_name": "com.alltech.cinefy"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "130903759798-di99nhr8h8l31qqlk2v9tr2l6dospdas.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alltech.cinefy",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "130903759798-au8s2j2gi2kq6hvuojqjq04fcr24fcjb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcTdOtffvFf36wTOs_ON5nZsX0eULQOBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "130903759798-au8s2j2gi2kq6hvuojqjq04fcr24fcjb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "130903759798-6lqsttqg3de6tj4qjdj7v8pinavb4ibg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cineverse.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130903759798:android:34fa929f59889d2b1e3f17",
+        "android_client_info": {
+          "package_name": "com.alltech.fire"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "130903759798-au8s2j2gi2kq6hvuojqjq04fcr24fcjb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcTdOtffvFf36wTOs_ON5nZsX0eULQOBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "130903759798-au8s2j2gi2kq6hvuojqjq04fcr24fcjb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "130903759798-6lqsttqg3de6tj4qjdj7v8pinavb4ibg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cineverse.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
