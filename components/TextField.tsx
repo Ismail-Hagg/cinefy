@@ -23,6 +23,7 @@ type Props = {
   widthOp?: DimensionValue;
   lines?: boolean;
   val?: string;
+  multiline?: boolean;
 };
 
 export default function TextField({
@@ -37,6 +38,7 @@ export default function TextField({
   lines,
   val,
   onChange,
+  multiline,
 }: Props) {
   const [active, setactive] = useState(false);
   const [passCover, setpassCover] = useState(password);
@@ -47,8 +49,8 @@ export default function TextField({
     <View style={{ flexDirection: "row" }}>
       <TextInput
         selectionColor={Colors.mainColor}
-        multiline
-        caretHidden={lines}
+        multiline={multiline}
+        caretHidden={lines ?? false}
         secureTextEntry={passCover}
         placeholder={holder}
         placeholderTextColor={holderColor}

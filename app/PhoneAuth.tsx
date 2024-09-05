@@ -1,23 +1,20 @@
 import {
-  StyleSheet,
   View,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
   ScrollView,
   Dimensions,
   Alert,
-  Text,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Colors } from "@/constants/Colors";
 import CustomButton from "@/components/CustomButton";
 import Avatar from "@/components/Avatar";
 import { pickImage } from "../util/functions";
-import { useRouter, useSegments } from "expo-router";
+import { useRouter } from "expo-router";
 import * as Localization from "expo-localization";
 import { FirebaseError } from "firebase/app";
 import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
@@ -25,7 +22,9 @@ import PhoneInput from "react-native-phone-input";
 import OTPTextInput from "react-native-otp-textinput";
 import TextField from "@/components/TextField";
 import { useAuthStore } from "@/stores/authStore";
-//   import { addUser, getUser } from "@/util/firebaseHelper";
+import { addUser, getUser } from "@/util/firebaseHelper";
+import { LocalUser } from "@/util/types";
+import { saveUserLocally } from "@/util/localStorage";
 
 const PhoneAuth = () => {
   const width = Dimensions.get("window").width;
@@ -35,14 +34,11 @@ const PhoneAuth = () => {
   const [userName, setuserName] = useState("");
   const [phoneNum, setphoneNum] = useState("");
   const [loading, setloading] = useState(false);
-  const [deviceLanguage, setdeviceLanguage] = useState(
-    Localization.getLocales()[0].languageTag
-  );
-  const [phoneActive, setphoneActive] = useState(false);
-  const [otp, setotp] = useState("");
   const [conferm, setconferm] =
     useState<FirebaseAuthTypes.ConfirmationResult | null>(null);
   const translation = useAuthStore((state) => state.localization);
+  const { changeLanguage, user, localization, setUser, language } =
+    useAuthStore();
 
   const pick = async () => {
     const result = await pickImage();
@@ -50,6 +46,81 @@ const PhoneAuth = () => {
       seturi(result.assets[0].uri);
     }
   };
+
+  const signup = async () => {
+    if (userName.trim() === "" || phoneNum.trim() === "") {
+      Alert.alert(translation.t("error"), translation.t("complete"));
+      return;
+    }
+    setloading(true);
+    try {
+      const user = await auth().signInWithPhoneNumber(phoneNum);
+      setconferm(user);
+    } catch (error) {
+      const err = error as FirebaseError;
+      Alert.alert(translation.t("error"), err.message);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const handleOtp = async (otp: string) => {
+    // logic could be better
+    if (otp.length == 6) {
+      console.log("====================================");
+      console.log(otp);
+      console.log("====================================");
+      setloading(true);
+      Keyboard.dismiss();
+      try {
+        const user = await conferm?.confirm(otp);
+        if (!user) {
+          Alert.alert(translation.t("error"), "something went wrong");
+          return;
+        }
+
+        const userData = await getUser(user.user.uid);
+        if (userData) {
+          // old user
+          const loadedUser = userData as LocalUser;
+          setUser(loadedUser);
+          saveUserLocally(loadedUser);
+          router.dismissAll();
+          router.replace("/(main)");
+        } else {
+          // new user
+          const newUser: LocalUser = {
+            userId: user.user.uid,
+            userName: userName,
+            email: "",
+            phoneNumber: phoneNum,
+            localPic: uri,
+            onlinePic: "",
+            messagingToken: "",
+            language: language,
+            watchList: [],
+            favs: [],
+            watching: [],
+            commentLike: [],
+            commentDislike: [],
+            followers: [],
+            following: [],
+          };
+
+          setUser(newUser);
+          saveUserLocally(newUser);
+          router.dismissAll();
+          router.replace("/(main)");
+          await addUser(newUser);
+        }
+      } catch (error) {
+        Alert.alert(translation.t("error"), translation.t("invalid"));
+      } finally {
+        setloading(false);
+      }
+    }
+  };
+
   return (
     <>
       <View
@@ -107,7 +178,7 @@ const PhoneAuth = () => {
                 {conferm !== null ? (
                   <View style={{ paddingVertical: 10 }}>
                     <OTPTextInput
-                      //   handleTextChange={(d) => handleOtp(d)}
+                      handleTextChange={(d) => handleOtp(d)}
                       inputCount={6}
                       tintColor={Colors.mainColor}
                       offTintColor={Colors.forgroundColor}
@@ -121,8 +192,7 @@ const PhoneAuth = () => {
               <CustomButton
                 title={translation.t("sign")}
                 isLoading={loading}
-                //onPress={signup}
-                onPress={() => {}}
+                onPress={signup}
                 padding={8}
               />
             </SafeAreaView>

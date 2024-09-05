@@ -1,12 +1,12 @@
 import {
   View,
-  Text,
   KeyboardAvoidingView,
   ScrollView,
   SafeAreaView,
   Dimensions,
   Platform,
   StyleSheet,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import Avatar from "@/components/Avatar";
@@ -16,10 +16,12 @@ import { useRouter } from "expo-router";
 import { pickImage } from "@/util/functions";
 import { Colors } from "@/constants/Colors";
 import { useAuthStore } from "@/stores/authStore";
+import auth from "@react-native-firebase/auth";
+import { saveUserLocally } from "@/util/localStorage";
+import { addUser } from "@/util/firebaseHelper";
+import { FirebaseError } from "firebase/app";
 
 const Signup = () => {
-  // const { translation, setLocalUser, localUser, setInitial } =
-  // useContext(AuthContext);
   const width = Dimensions.get("window").width;
   const [uri, seturi] = useState("");
   const router = useRouter();
@@ -28,13 +30,55 @@ const Signup = () => {
   const [password, setpassword] = useState("");
   const [email, setemail] = useState("");
   const [loading, setloading] = useState(false);
-
-  const translation = useAuthStore((state) => state.localization);
+  const { setUser, localization, language } = useAuthStore();
 
   const pick = async () => {
     const result = await pickImage();
     if (!result.canceled) {
       seturi(result.assets[0].uri);
+    }
+  };
+
+  const signup = async () => {
+    // logic could be better
+    if (
+      userName.trim() === "" ||
+      email.trim() === "" ||
+      password.trim() === ""
+    ) {
+      Alert.alert(localization.t("error"), localization.t("complete"));
+      return;
+    }
+    setloading(true);
+    try {
+      const user = await auth().createUserWithEmailAndPassword(email, password);
+      const newUser = {
+        userName,
+        email,
+        userId: user.user.uid,
+        phoneNumber: "",
+        localPic: uri.trim(),
+        onlinePic: "",
+        messagingToken: "",
+        language: language,
+        watchList: [],
+        favs: [],
+        watching: [],
+        commentLike: [],
+        commentDislike: [],
+        followers: [],
+        following: [],
+      };
+      setUser(newUser);
+      saveUserLocally(newUser);
+      router.dismissAll();
+      router.replace("/(main)");
+      await addUser(newUser);
+    } catch (error) {
+      const err = error as FirebaseError;
+      Alert.alert(localization.t("error"), err.message);
+    } finally {
+      setloading(false);
     }
   };
 
@@ -62,7 +106,7 @@ const Signup = () => {
             />
             <View style={{ marginVertical: 30 }}>
               <TextField
-                holder={translation.t("username")}
+                holder={localization.t("username")}
                 holderColor={Colors.whiteColor}
                 type="default"
                 elevation={15}
@@ -72,7 +116,7 @@ const Signup = () => {
               />
 
               <TextField
-                holder={translation.t("email")}
+                holder={localization.t("email")}
                 holderColor={Colors.whiteColor}
                 type="email-address"
                 elevation={10}
@@ -82,7 +126,7 @@ const Signup = () => {
               />
 
               <TextField
-                holder={translation.t("pass")}
+                holder={localization.t("pass")}
                 holderColor={Colors.whiteColor}
                 type="default"
                 elevation={10}
@@ -92,10 +136,9 @@ const Signup = () => {
               />
             </View>
             <CustomButton
-              title={translation.t("sign")}
+              title={localization.t("sign")}
               isLoading={loading}
-              //onPress={signup}
-              onPress={() => {}}
+              onPress={signup}
               padding={8}
             />
           </SafeAreaView>

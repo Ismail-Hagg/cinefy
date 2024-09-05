@@ -4,7 +4,9 @@ import * as ImagePicker from "expo-image-picker";
 
 // if there is a user in local storage return language , or return device language
 export const workingLan = (user: LocalUser | null): string => {
-  return user?.language || getLocales()[0]?.languageTag?.startsWith("en")
+  return user !== null
+    ? user?.language
+    : getLocales()[0]?.languageTag?.startsWith("en")
     ? "en"
     : "ar";
 };

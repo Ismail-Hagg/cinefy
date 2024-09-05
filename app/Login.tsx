@@ -3,8 +3,8 @@ import TextField from "@/components/TextField";
 import { Colors } from "@/constants/Colors";
 import { useAuthStore } from "@/stores/authStore";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useState } from "react";
+import { Redirect, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -13,6 +13,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  StatusBar,
 } from "react-native";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import auth from "@react-native-firebase/auth";
@@ -20,23 +21,30 @@ import { addUser, getUser } from "@/util/firebaseHelper";
 import { LocalUser } from "@/util/types";
 import { saveUserLocally } from "@/util/localStorage";
 import { FirebaseError } from "firebase/app";
+import * as SplashScreen from "expo-splash-screen";
+
+// SplashScreen.preventAutoHideAsync().then((val) => {
+//   console.log("index => ", val);
+// });
 
 GoogleSignin.configure({
   webClientId:
     "130903759798-au8s2j2gi2kq6hvuojqjq04fcr24fcjb.apps.googleusercontent.com",
 });
 
-export default function Index() {
+export default function Login() {
   const [Ref, setRef] = useState(false);
   const [password, setpassword] = useState("");
   const [email, setemail] = useState("");
   const [loading, setloading] = useState(false);
   const router = useRouter();
-  const changeLan = useAuthStore((state) => state.changeLanguage);
-  const user = useAuthStore((state) => state.user);
-  const translation = useAuthStore((state) => state.localization);
-  const currLan = useAuthStore((state) => state.language);
-  const setUser = useAuthStore((state) => state.setUser);
+  const { changeLanguage, user, localization, setUser, language } =
+    useAuthStore();
+
+  const wait = async () => {
+    console.log("waiting");
+    await new Promise((res) => setTimeout(res, 1000));
+  };
 
   const googleLogin = async () => {
     // logic could be better
@@ -59,7 +67,7 @@ export default function Index() {
           localPic: "",
           onlinePic: googleUser.user.photoURL ?? "",
           messagingToken: "",
-          language: translation.locale,
+          language: language,
           watchList: [],
           favs: [],
           watching: [],
@@ -70,23 +78,42 @@ export default function Index() {
         };
         setUser(user);
         saveUserLocally(user);
+        router.replace("/(main)");
         await addUser(user);
-        // router.replace("/(main)");
       } else {
         // old user
-        console.log("====================================");
-        console.log("old user");
-        console.log("====================================");
         setUser(onlineUser as LocalUser);
-
         saveUserLocally(onlineUser as LocalUser);
-
-        // router.replace("/(main)");
+        router.replace("/(main)");
       }
     } catch (error) {
       const err = error as FirebaseError;
-      Alert.alert(translation.t("error"), err.message);
+      Alert.alert(localization.t("error"), err.message);
       console.log(error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const emailLogin = async () => {
+    if (email.trim() === "" || password.trim() === "") {
+      Alert.alert(localization.t("error"), localization.t("complete"));
+      return;
+    }
+    setloading(true);
+    try {
+      const user = await auth().signInWithEmailAndPassword(email, password);
+      const onlineUser = await getUser(user.user.uid);
+      if (onlineUser) {
+        setUser(onlineUser as LocalUser);
+        saveUserLocally(onlineUser as LocalUser);
+        router.replace("/(main)");
+      } else {
+        Alert.alert(localization.t("error"), "something went wrong");
+      }
+    } catch (error) {
+      const err = error as FirebaseError;
+      Alert.alert(localization.t("error"), err.message);
     } finally {
       setloading(false);
     }
@@ -95,6 +122,7 @@ export default function Index() {
   return (
     <>
       <ScrollView style={{ flex: 1, backgroundColor: Colors.bacgroundColor }}>
+        <StatusBar barStyle={"light-content"} />
         <SafeAreaView>
           <View style={{ padding: 20, marginTop: 50 }}>
             <View style={{ alignItems: "center" }}>
@@ -115,12 +143,12 @@ export default function Index() {
                   color: Colors.secondaryColor,
                 }}
               >
-                {translation.t("message")}
+                {localization.t("message")}
               </Text>
             </View>
             <View style={{ marginVertical: 30 }}>
               <TextField
-                holder={translation.t("email")}
+                holder={localization.t("email")}
                 holderColor={Colors.whiteColor}
                 type="email-address"
                 elevation={10}
@@ -129,7 +157,7 @@ export default function Index() {
                 onChange={(e) => setemail(e)}
               />
               <TextField
-                holder={translation.t("pass")}
+                holder={localization.t("pass")}
                 holderColor={Colors.whiteColor}
                 type="default"
                 elevation={10}
@@ -141,9 +169,8 @@ export default function Index() {
             <CustomButton
               padding={12}
               isLoading={loading}
-              //onPress={login}
-              onPress={() => {}}
-              title={translation.t("login")}
+              onPress={emailLogin}
+              title={localization.t("login")}
             />
 
             <View
@@ -156,7 +183,7 @@ export default function Index() {
             >
               <View style={styles.divider} />
               <Text style={{ color: Colors.mainColor }}>
-                {translation.t("or")}
+                {localization.t("or")}
               </Text>
               <View style={styles.divider} />
             </View>
@@ -169,7 +196,7 @@ export default function Index() {
               <TouchableOpacity
                 style={styles.social}
                 // onPress={() => {
-                //   translation.locale = "ar";
+                //   localization.locale = "ar";
                 //   setRef(true);
                 // }}
                 onPress={googleLogin}

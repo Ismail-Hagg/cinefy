@@ -1,9 +1,17 @@
-import { View, Text } from "react-native";
 import React from "react";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { Stack } from "expo-router";
 
-const MainLayout = () => {
-  return <Slot />;
+const AppLayout = () => {
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="actorDetails" />
+      <Stack.Screen name="MovieDetailes" />
+      <Stack.Screen name="notificationsPage" />
+      <Stack.Screen name="searchPage" />
+      <Stack.Screen name="settings" />
+    </Stack>
+  );
 };
 
-export default MainLayout;
+export default AppLayout;

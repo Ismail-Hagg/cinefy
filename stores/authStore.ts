@@ -3,43 +3,28 @@ import { create } from "zustand";
 import { I18n } from "i18n-js";
 import { translation } from "@/util/translation";
 import { getLocales } from "expo-localization";
+import { workingLan } from "@/util/functions";
 
 type AuthStore = {
   user: LocalUser | null;
   localization: I18n;
   language: string;
-  setUser: (user: LocalUser | null) => void;
+  setUser: (intakeUser: LocalUser | null) => void;
   changeLanguage: (lan: "en" | "ar") => void;
 };
 
-// const initialLang = (): string =>
-//   user?.language || getLocales()[0]?.languageTag?.startsWith("en")
-//     ? "en"
-//     : "ar";
-// translation.locale = initialLang();
-
 export const useAuthStore = create<AuthStore>()((set) => ({
   user: null,
-  //   user: {
-  //     userName: "Seemoe",
-  //     userId: "",
-  //     email: "",
-  //     phoneNumber: "",
-  //     localPic: "",
-  //     onlinePic: "",
-  //     language: "",
-  //     messagingToken: "",
-  //     watchList: [],
-  //     favs: [],
-  //     watching: [],
-  //     commentLike: [],
-  //     commentDislike: [],
-  //     followers: [],
-  //     following: [],
-  //   },
-  language: "",
+  language: workingLan(null),
   localization: new I18n(translation),
-  setUser: (user) => set({ user }),
+  setUser: (intakeUser) => {
+    const lan = workingLan(intakeUser);
+    set({
+      user: intakeUser,
+      language: lan,
+      localization: new I18n(translation, { locale: lan }),
+    });
+  },
   changeLanguage: (lan: "en" | "ar") => {
     set((state) => ({
       localization: new I18n(translation, { locale: lan }),
