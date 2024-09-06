@@ -33,7 +33,13 @@ export default function RootLayout() {
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.bacgroundColor }}>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          statusBarStyle: "light",
+          statusBarTranslucent: true,
+        }}
+      />
     </View>
   );
 }
