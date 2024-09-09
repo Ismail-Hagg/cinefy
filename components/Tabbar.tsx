@@ -68,13 +68,6 @@ export const TabBar = ({
           }
         };
 
-        const onLongPress = () => {
-          navigation.emit({
-            type: "tabLongPress",
-            target: route.key,
-          });
-        };
-
         return (
           <TabBarItem
             key={route.name}

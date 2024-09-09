@@ -1,11 +1,13 @@
-import { View, Text } from "react-native";
+import { View, Text, ViewProps, Image } from "react-native";
 import React from "react";
+import Animated from "react-native-reanimated";
+import Movie from "@/components/Movie";
 
 const searchPage = () => {
   return (
-    <View>
-      <Text>searchPage</Text>
-    </View>
+    <View
+      style={{ flex: 1, justifyContent: "flex-start", alignItems: "center" }}
+    ></View>
   );
 };
 

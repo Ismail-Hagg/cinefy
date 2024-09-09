@@ -1,6 +1,7 @@
 import { getLocales } from "expo-localization";
 import { LocalUser } from "./types";
 import * as ImagePicker from "expo-image-picker";
+import { apiKey } from "./constants";
 
 // if there is a user in local storage return language , or return device language
 export const workingLan = (user: LocalUser | null): string => {
@@ -22,4 +23,28 @@ export const pickImage = async () => {
   });
 
   return result;
+};
+
+export const apiCall = async (link: string) => {
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization: "Bearer " + apiKey,
+    },
+  };
+  const response = await fetch(link, options);
+  const json = await response.json();
+  return json;
+};
+
+export const formatTime = (minutes: number) => {
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+
+  const formattedHours = hours < 10 ? `0${hours}` : hours;
+  const formattedMinutes =
+    remainingMinutes < 10 ? `0${remainingMinutes}` : remainingMinutes;
+
+  return `${formattedHours}:${formattedMinutes}`;
 };

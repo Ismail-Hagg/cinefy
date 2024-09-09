@@ -1,11 +1,29 @@
 import { View, Text } from "react-native";
 import React from "react";
+import { Skeleton } from "moti/skeleton";
+import { Colors } from "@/constants/Colors";
 
-const Loading = () => {
+type props = {
+  colors?: string[];
+  rad?: number;
+  height: number;
+  width: number;
+};
+
+const Loading = ({ colors, rad, height, width }: props) => {
   return (
-    <View>
-      <Text>Loading</Text>
-    </View>
+    <Skeleton
+      height={height}
+      width={width}
+      colors={
+        colors ?? [
+          Colors.forgroundColor,
+          Colors.bacgroundColor,
+          Colors.forgroundColor,
+        ]
+      }
+      radius={rad}
+    ></Skeleton>
   );
 };
 

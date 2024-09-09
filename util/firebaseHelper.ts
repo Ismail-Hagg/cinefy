@@ -18,3 +18,7 @@ export const getUser = async (userId: string) => {
 export const addUser = async (user: LocalUser) => {
   usersCollection.doc(user.userId).set(user);
 };
+
+export const updateUSer = async (user: {}, userId: string) => {
+  usersCollection.doc(userId).update(user);
+};

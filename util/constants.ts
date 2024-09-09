@@ -1,0 +1,4 @@
+export const apiKey: string =
+  "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlMTFjZmYwNGIxZmNmNTAwNzlmNjkxOGU1MTk5ZDY5MSIsIm5iZiI6MTcyNDE4MjExMC4xOTYxNTIsInN1YiI6IjYxNTFlNmIzNjdkY2M5MDAyYTYyZGUwZCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.t6M7NdTL4t7NQbmNq2L2SBskcMUNLpV0uAwaygwivy8";
+
+export const image_base = "https://image.tmdb.org/t/p/w1280";
