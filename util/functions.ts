@@ -48,3 +48,38 @@ export const formatTime = (minutes: number) => {
 
   return `${formattedHours}:${formattedMinutes}`;
 };
+
+export const getTimeDifferenceDescription = (date: Date): string => {
+  const now = new Date();
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds}   
+ seconds ago`;
+  } else if (diffInSeconds < 3600) {
+    const minutes = Math.floor(diffInSeconds / 60);
+    return `${minutes} minutes ago`;
+  } else if (diffInSeconds < 86400) {
+    const hours = Math.floor(diffInSeconds / 3600);
+    return `${hours} hours ago`;
+  } else if (diffInSeconds < 2592000) {
+    const days = Math.floor(diffInSeconds / 86400);
+    return `${days} days ago`;
+  } else if (diffInSeconds < 31536000) {
+    const months = Math.floor(diffInSeconds / 2592000);
+    return `${months} months ago`;
+  } else {
+    return date.toLocaleDateString();
+  }
+};
+
+export const dateCheck = (date: string): boolean => {
+  // Parse the date string into a Date object
+  const parsed = new Date(date);
+
+  // Get the current date and time
+  const currentDate = new Date();
+
+  // Compare the date objects
+  return parsed < currentDate;
+};

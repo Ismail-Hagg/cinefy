@@ -9,10 +9,11 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { Info, Results } from "@/util/types";
+import { CommentType, Episode, Info, Results } from "@/util/types";
 import { useQuery } from "@tanstack/react-query";
 import { apiCall, formatTime } from "@/util/functions";
 import { useAuthStore } from "@/stores/authStore";
@@ -21,7 +22,12 @@ import Movie from "@/components/Movie";
 import { image_base } from "@/util/constants";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
+import {
+  Feather,
+  FontAwesome,
+  FontAwesome6,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { countries } from "@/constants/countries";
 import Animated from "react-native-reanimated";
 import TitledMovieList from "@/components/TitledMovieList";
@@ -29,19 +35,29 @@ import { collection } from "@react-native-firebase/firestore";
 import { useFetchData } from "@/hooks/fetchData";
 import { StatusBar } from "expo-status-bar";
 import { genres } from "@/constants/genress";
+import TextField from "@/components/TextField";
+import Comment from "@/components/Comment";
+import { getComments } from "@/util/firebaseHelper";
+import EpisodeComponent from "@/components/Episode";
 
 const { width, height } = Dimensions.get("window");
 const MovieDetailes = () => {
   const router = useRouter();
-  const { localization } = useAuthStore();
+  const { localization, user } = useAuthStore();
   let details: Results = JSON.parse(
     useLocalSearchParams()["results"] as string
   );
+  let epalist: Episode[] = [];
   const ids = details.genre_ids;
   const [tabs, settabs] = useState(1);
   const [viewOpen, setviewOpen] = useState(false);
   const show = details.title === undefined;
   let info: Info | null = null;
+  const [commentField, setcommentField] = useState("");
+  const [comments, setcomments] = useState<CommentType[]>([]);
+  const [loadingComments, setloadingComments] = useState(false);
+  const [seasonNum, setseasonNum] = useState(1);
+  const [ascend, setascend] = useState(true);
 
   const detailCall = useFetchData(
     `https://api.themoviedb.org/3/${show ? "tv" : "movie"}/${
@@ -57,12 +73,23 @@ const MovieDetailes = () => {
     info = detailCall.data;
     details.genre_ids = ids;
   }
-  const thing = useFetchData(
+  const collectioin = useFetchData(
     `https://api.themoviedb.org/3/collection/${info?.belongs_to_collection?.id}?language=${localization.locale}`,
     [info?.belongs_to_collection?.id.toString() ?? "", localization.locale]
   );
-  if (thing.isSuccess && info?.belongs_to_collection) {
-    info.belongs_to_collection = thing.data;
+  if (collectioin.isSuccess && info?.belongs_to_collection) {
+    info.belongs_to_collection = collectioin.data;
+  }
+
+  const episodesCall = show
+    ? useFetchData(
+        `https://api.themoviedb.org/3/tv/${details.id}/season/${seasonNum}`,
+        ["episodes", details.id, seasonNum]
+      )
+    : null;
+
+  if (episodesCall && episodesCall.isSuccess) {
+    epalist = episodesCall.data["episodes"];
   }
 
   // const episodesCall = show
@@ -74,16 +101,81 @@ const MovieDetailes = () => {
   //         ),
   //     })
   //   : null;
-  // const thing = useFetchData(
-  //   `https://api.themoviedb.org/3/collection/"${info?.belongs_to_collection?.id}?language=${localization.locale}`,
-  //   ["one"]
-  // );
-  // if (thing.isSuccess) {
-  //   console.log(
-  //     `https://api.themoviedb.org/3/collection/${info?.belongs_to_collection?.id}?language=${localization.locale}`
-  //   );
-  //   console.log(thing.data);
-  // }
+
+  const delComment = async (comment: CommentType) => {
+    // setcomments(
+    //   comments.filter((item) => item.commentId !== comment.commentId)
+    // );
+    // await deleteComment(comment).catch((error) => {
+    //   comments.unshift(data);
+    //   Alert.alert("Error", "Something Went Wrong");
+    //   console.log(error);
+    // });
+  };
+
+  const likeComment = async (comment: CommentType) => {
+    // const user = { ...localUser };
+    // const index = user.commentLike?.indexOf(comment.commentId);
+    // if (index === -1) {
+    //   user.commentLike?.push(comment.commentId);
+    //   comment.likes += 1;
+    // } else {
+    //   user.commentLike?.splice(index!, 1);
+    //   comment.likes -= 1;
+    // }
+    // if (user.commentDislike?.includes(comment.commentId)) {
+    //   const index2 = user.commentDislike.indexOf(comment.commentId);
+    //   if (index2 !== -1) {
+    //     user.commentDislike.splice(index2, 1);
+    //     comment.dislikes -= 1;
+    //   }
+    // }
+    // setLocalUser(user as localUser);
+    // await updateComment(comment);
+  };
+
+  const dislikeComment = async (comment: CommentType) => {
+    // const user = { ...localUser };
+    // const index = user.commentDislike?.indexOf(comment.commentId);
+    // if (index === -1) {
+    //   user.commentDislike?.push(comment.commentId);
+    //   comment.dislikes += 1;
+    // } else {
+    //   user.commentDislike?.splice(index!, 1);
+    //   comment.dislikes -= 1;
+    // }
+    // if (user.commentLike?.includes(comment.commentId)) {
+    //   const index2 = user.commentLike.indexOf(comment.commentId);
+    //   if (index2 !== -1) {
+    //     user.commentLike.splice(index2, 1);
+    //     comment.likes -= 1;
+    //   }
+    // }
+    // setLocalUser(user as localUser);
+    // await updateComment(comment);
+  };
+
+  const seasonFlip = (season: number) => {
+    if (seasonNum !== season) {
+      setseasonNum(season);
+    }
+  };
+
+  const laodComments = async () => {
+    setloadingComments(true);
+    const commentsFire = await getComments(details.id);
+    if (commentsFire.docs.length > 0) {
+      for (let index = 0; index < commentsFire.docs.length; index++) {
+        comments.push(commentsFire.docs[index].data() as CommentType);
+      }
+    }
+    setloadingComments(false);
+  };
+
+  useEffect(() => {
+    // comments = [];
+    laodComments();
+  }, []);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.bacgroundColor }}>
@@ -482,6 +574,198 @@ const MovieDetailes = () => {
                   loading={false}
                 />
               )}
+          </View>
+        )}
+        {tabs == 3 && (
+          <View style={{ flex: 1 }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ paddingHorizontal: 8 }}>
+                <TextField
+                  val={commentField}
+                  padding={12}
+                  lines
+                  multiline
+                  holder="Post a Comment"
+                  holderColor={Colors.secondaryColor}
+                  elevation={5}
+                  type="default"
+                  password={false}
+                  onChange={(text) => setcommentField(text)}
+                  onEndEditing={(text) => {}}
+                />
+                <TouchableOpacity
+                  // onPress={fieldAction}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    right: 22,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {commentField.trim() === "" ? (
+                    <Feather
+                      name="more-vertical"
+                      size={24}
+                      color={Colors.mainColor}
+                    />
+                  ) : (
+                    <FontAwesome
+                      name="send"
+                      size={24}
+                      color={Colors.mainColor}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+            <FlatList
+              scrollEnabled={false}
+              data={comments}
+              keyExtractor={(item) => item.commentId}
+              renderItem={({ item, index }) => (
+                <Comment
+                  likePress={() => {
+                    likeComment(item);
+                  }}
+                  disslikePress={() => dislikeComment(item)}
+                  replyPress={() => {
+                    console.log("reply");
+                  }}
+                  deleteComment={() => {
+                    delComment(item);
+                  }}
+                  myComment={item.id === user?.userId}
+                  comment={item}
+                  isDisliked={(user?.commentDislike as string[]).includes(
+                    item.commentId
+                  )}
+                  isLiked={(user?.commentLike as string[]).includes(
+                    item.commentId
+                  )}
+                />
+              )}
+            />
+          </View>
+        )}
+        {tabs === 2 && (
+          <View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                margin: 8,
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <View
+                style={{
+                  width: width * 0.8,
+                  alignItems: "center",
+
+                  flexDirection: "row",
+                }}
+              >
+                <Text style={{ color: Colors.mainColor }}>Seasons : </Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {Array.from(
+                    { length: details.number_of_seasons ?? 0 },
+                    (_, index) => (
+                      <Pressable
+                        key={index}
+                        onPress={() => seasonFlip(index + 1)}
+                      >
+                        <View
+                          style={{
+                            alignItems: "center",
+                            marginHorizontal: 4,
+                            backgroundColor: Colors.forgroundColor,
+                            borderRadius: 5,
+                            borderWidth: 1,
+                            borderColor:
+                              seasonNum == index + 1
+                                ? Colors.mainColor
+                                : Colors.bacgroundColor,
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color:
+                                seasonNum == index + 1
+                                  ? Colors.mainColor
+                                  : Colors.blackColor,
+                              paddingVertical: 6,
+                              paddingHorizontal: 8,
+                            }}
+                          >
+                            {index + 1}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    )
+                  )}
+                </ScrollView>
+              </View>
+              {/* <TouchableOpacity>
+                <View
+                  style={{
+                    borderRadius: 5,
+                    borderColor: Colors.mainColor,
+                    borderWidth: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      paddingHorizontal: 8,
+                      paddingVertical: 4,
+                      color: Colors.mainColor,
+                    }}
+                  >
+                    Season {seasonNum}
+                  </Text>
+                </View>
+              </TouchableOpacity> */}
+              <TouchableOpacity
+                onPress={() => {
+                  epalist.sort((a, b) =>
+                    ascend
+                      ? a.episode_number - b.episode_number
+                      : b.episode_number - a.episode_number
+                  );
+                  setascend(!ascend);
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="sort-ascending"
+                  size={24}
+                  color={Colors.mainColor}
+                />
+              </TouchableOpacity>
+            </View>
+            {episodesCall?.isRefetching && (
+              <ActivityIndicator size={"large"} color={Colors.mainColor} />
+            )}
+            {episodesCall?.isSuccess && (
+              <View style={{ marginVertical: 12 }}>
+                <FlatList
+                  data={epalist}
+                  scrollEnabled={false}
+                  renderItem={({ item }) => (
+                    <EpisodeComponent
+                      key={item.id}
+                      num={item.episode_number}
+                      episode={item}
+                      width={width * 0.125}
+                    />
+                  )}
+                />
+              </View>
+            )}
           </View>
         )}
       </ScrollView>

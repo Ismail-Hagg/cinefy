@@ -1,3 +1,5 @@
+import { Timestamp } from "@react-native-firebase/firestore";
+
 export type LocalUser = {
   userName: string;
   userId: string;
@@ -68,4 +70,33 @@ export type Info = {
   belongs_to_collection?: BelongsToCollection;
   credits?: Credit;
   recommendations?: RootResult;
+};
+
+export type CommentType = {
+  id: string;
+  name: string;
+  link: string;
+  token: string;
+  topLevel: boolean;
+  numberOfReplies: number;
+  time: Timestamp;
+  movieId: number;
+  comment: string;
+  commentId: string;
+  likes: number;
+  dislikes: number;
+  subComments: CommentType[];
+};
+
+export type Episode = {
+  air_date: string;
+  episode_number: number;
+  id: number;
+  name: string;
+  overview: string;
+  runtime: number;
+  season_number: number;
+  show_id: number;
+  still_path: string;
+  vote_average: number;
 };

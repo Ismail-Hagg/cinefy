@@ -22,3 +22,12 @@ export const addUser = async (user: LocalUser) => {
 export const updateUSer = async (user: {}, userId: string) => {
   usersCollection.doc(userId).update(user);
 };
+
+export const getComments = async (movieId: number) => {
+  const comments = await otherCollection
+    .doc(movieId.toString())
+    .collection(FirebsaePaths[FirebsaePaths.comments])
+    .orderBy("time", "desc")
+    .get();
+  return comments;
+};
