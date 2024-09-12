@@ -36,6 +36,9 @@ export const translation = {
     recommend: "Recommendations",
     parts: "Parts",
     cast: "Cast",
+    watchadd: "Add to Watchlist",
+    watchremove: "Remove from Watchlist",
+    keepingadd: "Add to Keeping",
   },
   ar: {
     home: "الرئيسية",
@@ -74,5 +77,8 @@ export const translation = {
     recommend: "التوصيات",
     parts: "اجزاء",
     cast: "الممثلون",
+    watchadd: "اضافة لقائمة المشاهدة",
+    keepingadd: "اضافة للمتابعة",
+    watchremove: "حذف من قائمة المشاهدة",
   },
 };

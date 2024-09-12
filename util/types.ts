@@ -70,6 +70,9 @@ export type Info = {
   belongs_to_collection?: BelongsToCollection;
   credits?: Credit;
   recommendations?: RootResult;
+  images?: {
+    backdrops: { file_path: string }[];
+  };
 };
 
 export type CommentType = {
@@ -99,4 +102,26 @@ export type Episode = {
   show_id: number;
   still_path: string;
   vote_average: number;
+};
+
+export type Keeping = {
+  change: Timestamp;
+  isUpdated: boolean;
+  name: string;
+  id: number;
+  episode: number;
+  season: number;
+  userEpisodes: number;
+  userSeasons: number;
+  nextEpisodeDate: string;
+  nextSeason: number;
+  nextEpisode: number;
+  overView: string;
+  poster: string;
+  backdrop: string;
+  watching: string[];
+  releaseDate: string;
+  status: string;
+  token: string;
+  voteAverage: number;
 };

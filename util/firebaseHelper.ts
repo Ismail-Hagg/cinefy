@@ -1,6 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import { FirebsaePaths } from "./enums";
-import { LocalUser } from "./types";
+import { LocalUser, Results } from "./types";
 
 const usersCollection = firestore().collection(
   FirebsaePaths[FirebsaePaths.users]
@@ -16,11 +16,65 @@ export const getUser = async (userId: string) => {
 };
 
 export const addUser = async (user: LocalUser) => {
-  usersCollection.doc(user.userId).set(user);
+  await usersCollection.doc(user.userId).set(user);
 };
 
 export const updateUSer = async (user: {}, userId: string) => {
-  usersCollection.doc(userId).update(user);
+  await usersCollection.doc(userId).update(user);
+};
+
+export const addRecord = async (
+  userId: string,
+  path: string,
+  movie: Results
+) => {
+  const {
+    id,
+    genre_ids,
+    backdrop_path,
+    title,
+    name,
+    status,
+    runtime,
+    number_of_seasons,
+    origin_country,
+    vote_average,
+    overview,
+    poster_path,
+  } = movie;
+  const sendOb = {
+    id,
+    genre_ids,
+    backdrop_path,
+    title,
+    name,
+    status,
+    runtime,
+    number_of_seasons,
+    origin_country,
+    vote_average: parseFloat(vote_average.toFixed(2)),
+    overview,
+    poster_path,
+  };
+  const pure = JSON.parse(JSON.stringify(sendOb));
+
+  await usersCollection
+    .doc(userId)
+    .collection(path)
+    .doc(movie.id.toString())
+    .set(pure);
+};
+
+export const deleteRecodr = async (
+  userId: string,
+  path: string,
+  movie: Results
+) => {
+  await usersCollection
+    .doc(userId)
+    .collection(path)
+    .doc(movie.id.toString())
+    .delete();
 };
 
 export const getComments = async (movieId: number) => {
@@ -31,3 +85,7 @@ export const getComments = async (movieId: number) => {
     .get();
   return comments;
 };
+
+// export const addKeeping=async()=>{
+//   await otherCollection.doc()
+// }
