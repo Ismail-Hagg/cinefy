@@ -71,7 +71,14 @@ export type Info = {
   credits?: Credit;
   recommendations?: RootResult;
   images?: {
-    backdrops: { file_path: string }[];
+    posters: { file_path: string }[];
+  };
+  videos?: {
+    results: {
+      key: string;
+      site: string;
+      type: string;
+    }[];
   };
 };
 

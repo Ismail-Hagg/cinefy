@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Pressable,
   SectionList,
+  Linking,
 } from "react-native";
 import React, {
   useCallback,
@@ -196,6 +197,28 @@ const MovieDetailes = () => {
       }
     }
     setloadingComments(false);
+  };
+
+  const trail = () => {
+    if (
+      detailCall.isSuccess &&
+      info?.videos &&
+      info.videos.results.length !== 0
+    ) {
+      const lst = info?.videos.results.filter(
+        (item) => item.type === "Trailer"
+      );
+      const index = Math.floor(Math.random() * lst.length);
+      const link = `https://www.youtube.com/watch?v=${lst[index].key}`;
+
+      try {
+        Linking.openURL(link);
+      } catch (error) {
+        Alert.alert("Error", "Something Went Wrong");
+      }
+      return;
+    }
+    Alert.alert("Error", "No Trailer Found");
   };
 
   const favWAtch = async (movieId: string, fav: boolean) => {
@@ -483,7 +506,7 @@ const MovieDetailes = () => {
                       }}
                     >
                       <TouchableOpacity
-                        // onPress={trail}
+                        onPress={trail}
                         style={{
                           height: "100%",
                           width: "100%",
@@ -507,7 +530,7 @@ const MovieDetailes = () => {
                               shadowColor: "grey",
                             }}
                           >
-                            Watch Trailer
+                            {localization.t("trailer")}
                           </Text>
                         )}
                       </TouchableOpacity>
