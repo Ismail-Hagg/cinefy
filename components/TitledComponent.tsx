@@ -6,8 +6,9 @@ type props = {
   more?: string;
   content: React.JSX.Element;
   title: string;
+  action?: () => void;
 };
-const TitledComponent = ({ more, content, title }: props) => {
+const TitledComponent = ({ more, content, title, action }: props) => {
   return (
     <View>
       <View
@@ -20,7 +21,7 @@ const TitledComponent = ({ more, content, title }: props) => {
       >
         <Text style={{ color: Colors.mainColor, fontSize: 16 }}>{title}</Text>
         {more && (
-          <TouchableOpacity>
+          <TouchableOpacity onPress={action}>
             <Text style={{ color: Colors.mainColor, fontSize: 12 }}>
               {more}
             </Text>

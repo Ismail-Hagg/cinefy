@@ -40,6 +40,7 @@ export default function RootLayout() {
             headerShown: false,
             statusBarStyle: "light",
             statusBarTranslucent: true,
+            statusBarColor: "transparent",
           }}
         />
       </View>

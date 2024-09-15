@@ -21,7 +21,15 @@ import React, {
   useState,
 } from "react";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import { CommentType, Episode, Info, LocalUser, Results } from "@/util/types";
+import {
+  Actor,
+  CommentType,
+  Episode,
+  Info,
+  Keeping,
+  LocalUser,
+  Results,
+} from "@/util/types";
 import { useQuery } from "@tanstack/react-query";
 import { apiCall, formatTime } from "@/util/functions";
 import { useAuthStore } from "@/stores/authStore";
@@ -40,7 +48,7 @@ import {
 import { countries } from "@/constants/countries";
 import Animated, { useSharedValue } from "react-native-reanimated";
 import TitledMovieList from "@/components/TitledMovieList";
-import { collection } from "@react-native-firebase/firestore";
+import { collection, Timestamp } from "@react-native-firebase/firestore";
 import { useFetchData } from "@/hooks/fetchData";
 import { StatusBar } from "expo-status-bar";
 import { genres } from "@/constants/genress";
@@ -50,7 +58,10 @@ import {
   addRecord,
   deleteRecodr,
   getComments,
+  isKeeping,
+  keepingAdd,
   updateUSer,
+  userKeepingAdd,
 } from "@/util/firebaseHelper";
 import EpisodeComponent from "@/components/Episode";
 import { saveUserLocally } from "@/util/localStorage";
@@ -66,7 +77,6 @@ import {
 } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BlurView } from "expo-blur";
-import Keeping from "./(tabs)/keeping";
 
 const { width, height } = Dimensions.get("window");
 const MovieDetailes = () => {
@@ -206,10 +216,13 @@ const MovieDetailes = () => {
       info.videos.results.length !== 0
     ) {
       const lst = info?.videos.results.filter(
-        (item) => item.type === "Trailer"
+        (item) => item.type === "Trailer" && item.site === "YouTube"
       );
-      const index = Math.floor(Math.random() * lst.length);
-      const link = `https://www.youtube.com/watch?v=${lst[index].key}`;
+      const index = lst.length > 0 ? Math.floor(Math.random() * lst.length) : 0;
+      const link =
+        lst.length > 0
+          ? `https://www.youtube.com/watch?v=${lst[index].key}`
+          : "";
 
       try {
         Linking.openURL(link);
@@ -262,8 +275,54 @@ const MovieDetailes = () => {
     favwatchLoading = false;
   };
 
-  const addKeeping = async () => {
-    bottomSheetModalRef.current?.present();
+  const addKeeping = async (movieId: string) => {
+    bottomSheetModalRef.current?.close();
+    if (user?.watching.includes(movieId)) {
+      Alert.alert("Already Exists In Keeping");
+      return;
+    }
+    const tempUser = { ...user } as LocalUser;
+    const keepOpject: Keeping = {
+      change: Timestamp.now(),
+      isUpdated: false,
+      name: details.name as string,
+      id: details.id as number,
+      episode: details.last_episode_to_air?.episode_number as number,
+      season: details.last_episode_to_air?.season_number as number,
+      userEpisodes: 1,
+      userSeasons: 1,
+      nextEpisodeDate: details.next_episode_to_air
+        ? details.next_episode_to_air.air_date
+        : "",
+      nextSeason: details.next_episode_to_air
+        ? details.next_episode_to_air.season_number
+        : 0,
+      nextEpisode: details.next_episode_to_air
+        ? details.next_episode_to_air.episode_number
+        : 0,
+      overView: details.overview,
+      poster: details.poster_path,
+      backdrop: details.backdrop_path,
+      watching: [user?.userId as string],
+      releaseDate: details.first_air_date ?? "",
+      status: details.status ?? "",
+      token: user?.messagingToken as string,
+      voteAverage: details.vote_average,
+    };
+    tempUser.watching.push(movieId);
+    setUser(tempUser);
+    saveUserLocally(tempUser);
+    Alert.alert("Added to Keeping");
+    await updateUSer({ watching: tempUser.watching }, user?.userId as string);
+    await userKeepingAdd(keepOpject, user?.userId as string);
+    const exist = await isKeeping(movieId);
+    if (exist.exists) {
+      let data: Keeping = exist.data() as Keeping;
+      data.watching = [...data.watching, user?.userId as string];
+      await keepingAdd(data);
+    } else {
+      await keepingAdd(keepOpject);
+    }
   };
 
   const bookmark = async (movieId: string, fav: boolean) => {
@@ -682,9 +741,15 @@ const MovieDetailes = () => {
                             width={width * 0.25}
                             radius={20}
                             click={() => {
+                              const actor: Actor = {
+                                id: item.id,
+                                name: item.name,
+                                profile_path: item.profile_path as string,
+                              };
+
                               router.push({
                                 pathname: "/(main)/actorDetails",
-                                params: { data: JSON.stringify(item) },
+                                params: { data: JSON.stringify(actor) },
                               });
                             }}
                           />
@@ -924,7 +989,10 @@ const MovieDetailes = () => {
                 )}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.sheetbutton}>
+            <TouchableOpacity
+              style={styles.sheetbutton}
+              onPress={() => addKeeping(details.id.toString())}
+            >
               <Text style={styles.sheetbuttontext}>
                 {localization.t("keepingadd")}
               </Text>

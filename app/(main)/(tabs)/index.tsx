@@ -1,4 +1,4 @@
-import { View, Text, FlatList, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import React from "react";
 import { Colors } from "@/constants/Colors";
 import { useAuthStore } from "@/stores/authStore";
@@ -8,10 +8,12 @@ import TitledComponent from "@/components/TitledComponent";
 import TitledMovieList from "@/components/TitledMovieList";
 import { useQuery } from "@tanstack/react-query";
 import { apiCall } from "@/util/functions";
-import { RootResult } from "@/util/types";
+import { RootResult, SearchPage } from "@/util/types";
+import { useRouter } from "expo-router";
 
 const Home = () => {
   const { user, localization } = useAuthStore();
+  const router = useRouter();
   const placeHolder: RootResult = {
     page: 1,
     results: [],
@@ -65,6 +67,15 @@ const Home = () => {
         `https://api.themoviedb.org/3/tv/top_rated?language=${localization.locale}`
       ),
   });
+
+  const navigate = (data: SearchPage) => {
+    router.push({
+      pathname: "/(main)/searchPage",
+      params: {
+        data: JSON.stringify(data),
+      },
+    });
+  };
   return (
     <View
       style={{
@@ -77,6 +88,18 @@ const Home = () => {
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
       >
+        <TouchableOpacity
+          onPress={() =>
+            navigate({
+              link: "",
+              results: [],
+              search: 1,
+              title: "",
+            })
+          }
+        >
+          <Text>search</Text>
+        </TouchableOpacity>
         {/* trending movies */}
         <View style={{ width: "100%" }}>
           <TitledMovieList
@@ -84,6 +107,14 @@ const Home = () => {
             more={localization.t("more")}
             data={trending.isLoading ? placeHolder : trending.data}
             loading={trending.isLoading}
+            action={() =>
+              navigate({
+                link: `https://api.themoviedb.org/3/trending/movie/day?language=${localization.locale}&page=`,
+                results: [],
+                search: 0,
+                title: localization.t("trending"),
+              })
+            }
           />
         </View>
         {/* upcoming movies */}
@@ -93,6 +124,14 @@ const Home = () => {
             more={localization.t("more")}
             data={upcomingMovies.isLoading ? placeHolder : upcomingMovies.data}
             loading={upcomingMovies.isLoading}
+            action={() =>
+              navigate({
+                link: `https://api.themoviedb.org/3/movie/upcoming?language=${localization.locale}&page=`,
+                results: [],
+                search: 0,
+                title: localization.t("upmovie"),
+              })
+            }
           />
         </View>
         {/* popular movies */}
@@ -102,6 +141,14 @@ const Home = () => {
             more={localization.t("more")}
             data={popularMovies.isLoading ? placeHolder : popularMovies.data}
             loading={popularMovies.isLoading}
+            action={() =>
+              navigate({
+                link: `https://api.themoviedb.org/3/movie/popular?language${localization.locale}&page=`,
+                results: [],
+                search: 0,
+                title: localization.t("popmove"),
+              })
+            }
           />
         </View>
         {/* popular shows */}
@@ -111,6 +158,14 @@ const Home = () => {
             more={localization.t("more")}
             data={popularShows.isLoading ? placeHolder : popularShows.data}
             loading={popularShows.isLoading}
+            action={() =>
+              navigate({
+                link: `https://api.themoviedb.org/3/tv/popular?language=${localization.locale}&page=`,
+                results: [],
+                search: 0,
+                title: localization.t("popshow"),
+              })
+            }
           />
         </View>
         {/* toop movies */}
@@ -120,6 +175,14 @@ const Home = () => {
             more={localization.t("more")}
             data={topMovies.isLoading ? [] : topMovies.data}
             loading={topMovies.isLoading}
+            action={() =>
+              navigate({
+                link: `https://api.themoviedb.org/3/movie/top_rated?language=${localization.locale}&page=`,
+                results: [],
+                search: 0,
+                title: localization.t("topmovie"),
+              })
+            }
           />
         </View>
         {/* toop shows */}
@@ -131,6 +194,14 @@ const Home = () => {
               topShows.isLoading ? Array.from({ length: 10 }) : topShows.data
             }
             loading={topShows.isLoading}
+            action={() =>
+              navigate({
+                link: `https://api.themoviedb.org/3/tv/top_rated?language=${localization.locale}&page=`,
+                results: [],
+                search: 0,
+                title: localization.t("topshow"),
+              })
+            }
           />
         </View>
         <View style={{ height: 120 }}></View>

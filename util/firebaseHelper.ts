@@ -1,6 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import { FirebsaePaths } from "./enums";
-import { LocalUser, Results } from "./types";
+import { Keeping, LocalUser, Results } from "./types";
 
 const usersCollection = firestore().collection(
   FirebsaePaths[FirebsaePaths.users]
@@ -86,6 +86,30 @@ export const getComments = async (movieId: number) => {
   return comments;
 };
 
-// export const addKeeping=async()=>{
-//   await otherCollection.doc()
-// }
+export const isKeeping = async (movieId: string) => {
+  const load = await otherCollection.doc(movieId).get();
+  return load;
+};
+
+export const keepingAdd = async (obj: Keeping) => {
+  await otherCollection.doc(obj.id.toString()).set(obj);
+};
+
+export const keepingDelete = async (obj: Keeping) => {
+  await otherCollection.doc(obj.id.toString()).delete();
+};
+
+export const userKeepingAdd = async (obj: Keeping, userId: string) => {
+  await usersCollection
+    .doc(userId)
+    .collection(FirebsaePaths[FirebsaePaths.keeping])
+    .doc(obj.id.toString())
+    .set(obj);
+};
+export const userKeepingDelete = async (obj: Keeping, userId: string) => {
+  await usersCollection
+    .doc(userId)
+    .collection(FirebsaePaths[FirebsaePaths.keeping])
+    .doc(obj.id.toString())
+    .delete();
+};

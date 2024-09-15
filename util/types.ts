@@ -41,6 +41,16 @@ export type Results = {
   number_of_seasons?: number;
   runtime?: number;
   origin_country: string[];
+  last_episode_to_air?: {
+    air_date: string;
+    episode_number: number;
+    season_number: number;
+  };
+  next_episode_to_air?: {
+    air_date: string;
+    episode_number: number;
+    season_number: number;
+  };
 };
 
 export type BelongsToCollection = {
@@ -131,4 +141,28 @@ export type Keeping = {
   status: string;
   token: string;
   voteAverage: number;
+};
+
+export type Actor = {
+  adult?: boolean;
+  biography?: string;
+  birthday?: string;
+  id: number;
+  imdb_id?: string;
+  name: string;
+  profile_path: string;
+  combined_credits?: {
+    cast: Results[];
+    crew: (Results & { job: string })[];
+  };
+  images?: {
+    profiles: { file_path: string }[];
+  };
+};
+
+export type SearchPage = {
+  title?: string;
+  results: (Results & Actor)[];
+  link?: string;
+  search: number;
 };

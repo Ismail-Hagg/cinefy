@@ -1,4 +1,10 @@
-import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  TextStyle,
+} from "react-native";
 import React from "react";
 import { Colors } from "@/constants/Colors";
 
@@ -7,9 +13,20 @@ type Props = {
   onPress: () => void;
   title: string;
   padding: number;
+  size?: number;
+  noBold?: TextStyle["fontWeight"];
+  radius?: number;
 };
 
-const CustomButton = ({ isLoading, title, onPress, padding }: Props) => {
+const CustomButton = ({
+  isLoading,
+  title,
+  onPress,
+  padding,
+  size,
+  noBold,
+  radius,
+}: Props) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -17,7 +34,7 @@ const CustomButton = ({ isLoading, title, onPress, padding }: Props) => {
         padding: padding,
         backgroundColor: Colors.mainColor,
         marginVertical: 10,
-        borderRadius: 10,
+        borderRadius: radius ?? 10,
         elevation: 10,
         shadowColor: "black",
       }}
@@ -29,8 +46,8 @@ const CustomButton = ({ isLoading, title, onPress, padding }: Props) => {
           style={{
             color: Colors.bacgroundColor,
             textAlign: "center",
-            fontSize: 24,
-            fontWeight: "bold",
+            fontSize: size ?? 24,
+            fontWeight: noBold ?? "bold",
           }}
         >
           {title}

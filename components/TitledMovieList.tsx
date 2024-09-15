@@ -16,6 +16,7 @@ type props = {
   loading: boolean;
   customheight?: number;
   customWidth?: number;
+  action?: () => void;
 };
 
 const TitledMovieList = ({
@@ -26,6 +27,7 @@ const TitledMovieList = ({
   customWidth,
   customheight,
   resData,
+  action,
 }: props) => {
   const { width } = Dimensions.get("window");
   const router = useRouter();
@@ -35,6 +37,7 @@ const TitledMovieList = ({
       <TitledComponent
         title={title}
         more={more}
+        action={action}
         content={
           <FlatList
             showsHorizontalScrollIndicator={false}
