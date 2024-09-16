@@ -1,13 +1,28 @@
-import { View, Text } from "react-native";
+import { View, Text, useWindowDimensions } from "react-native";
 import React, { useEffect } from "react";
+import { Colors } from "@/constants/Colors";
+import Carousel from "@/components/Carousel";
 
 const Keeping = () => {
-  useEffect(() => {
-    console.log("hello");
-  }, []);
+  const { width } = useWindowDimensions();
   return (
-    <View>
-      <Text>keeping</Text>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: Colors.bacgroundColor,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <View
+        style={{
+          marginTop: 100,
+          // width: width * 0.7,
+          height: width * 0.5,
+        }}
+      >
+        {/* <Carousel /> */}
+      </View>
     </View>
   );
 };

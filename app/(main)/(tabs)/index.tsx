@@ -1,4 +1,11 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  useWindowDimensions,
+  Pressable,
+} from "react-native";
 import React from "react";
 import { Colors } from "@/constants/Colors";
 import { useAuthStore } from "@/stores/authStore";
@@ -9,9 +16,14 @@ import TitledMovieList from "@/components/TitledMovieList";
 import { useQuery } from "@tanstack/react-query";
 import { apiCall } from "@/util/functions";
 import { RootResult, SearchPage } from "@/util/types";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import Carousel from "@/components/Carousel";
+import Loading from "@/components/Loading";
+import { Ionicons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
+  const { width } = useWindowDimensions();
   const { user, localization } = useAuthStore();
   const router = useRouter();
   const placeHolder: RootResult = {
@@ -83,12 +95,113 @@ const Home = () => {
         backgroundColor: Colors.bacgroundColor,
       }}
     >
-      <View style={{ height: 100 }}></View>
       <ScrollView
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity
+        <SafeAreaView>
+          <View
+            style={{
+              backgroundColor: Colors.bacgroundColor,
+              width,
+              height: width * 0.23,
+              alignItems: "center",
+              flexDirection: "row",
+            }}
+          >
+            <View
+              style={{
+                height: width * 0.1,
+                width: width * 0.74,
+                justifyContent: "center",
+                alignItems: "center",
+                // backgroundColor: "blue",
+              }}
+            >
+              <Pressable
+                onPress={() =>
+                  navigate({
+                    link: "",
+                    results: [],
+                    search: 1,
+                    title: "",
+                  })
+                }
+                style={{
+                  height: width * 0.12,
+                  width: width * 0.7,
+                  borderRadius: 5,
+                  elevation: 10,
+                  shadowColor: "black",
+                  backgroundColor: Colors.bacgroundColor,
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <Ionicons
+                  name="search"
+                  size={24}
+                  color={Colors.secondaryColor}
+                  style={{ paddingHorizontal: 8 }}
+                />
+                <Text style={{ fontSize: 12, color: Colors.secondaryColor }}>
+                  Search for Movie , Show , People
+                </Text>
+              </Pressable>
+            </View>
+            <TouchableOpacity
+              style={{
+                height: width * 0.12,
+                width: width * 0.12,
+                justifyContent: "center",
+                alignItems: "center",
+                // backgroundColor: "red",
+              }}
+            >
+              <Ionicons
+                name="notifications"
+                size={24}
+                color={Colors.mainColor}
+                style={{ marginHorizontal: 12 }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                height: width * 0.12,
+                width: width * 0.12,
+                justifyContent: "center",
+                alignItems: "center",
+                // backgroundColor: "green",
+              }}
+            >
+              <Ionicons
+                name="filter"
+                size={24}
+                color={Colors.mainColor}
+                style={{ marginHorizontal: 12 }}
+              />
+            </TouchableOpacity>
+            {/* <View>
+              <Text>search place</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Ionicons
+                name="notifications"
+                size={24}
+                color={Colors.mainColor}
+                style={{ marginHorizontal: 12 }}
+              />
+              <Ionicons name="filter" size={24} color={Colors.mainColor} />
+            </View> */}
+          </View>
+        </SafeAreaView>
+        {/* <TouchableOpacity
           onPress={() =>
             navigate({
               link: "",
@@ -99,14 +212,13 @@ const Home = () => {
           }
         >
           <Text>search</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
         {/* trending movies */}
         <View style={{ width: "100%" }}>
-          <TitledMovieList
+          <TitledComponent
             title={localization.t("trending")}
             more={localization.t("more")}
-            data={trending.isLoading ? placeHolder : trending.data}
-            loading={trending.isLoading}
             action={() =>
               navigate({
                 link: `https://api.themoviedb.org/3/trending/movie/day?language=${localization.locale}&page=`,
@@ -115,8 +227,37 @@ const Home = () => {
                 title: localization.t("trending"),
               })
             }
+            content={
+              trending.isLoading || trending.isError ? (
+                <View
+                  style={{
+                    width,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginVertical: 12,
+                    flexDirection: "row",
+                  }}
+                >
+                  <Loading height={width * 0.4} width={width * 0.7} rad={10} />
+                  <View style={{ marginHorizontal: 12 }}>
+                    <Loading
+                      height={width * 0.45}
+                      width={width * 0.7}
+                      rad={10}
+                    />
+                  </View>
+
+                  <Loading height={width * 0.4} width={width * 0.7} rad={10} />
+                </View>
+              ) : (
+                <View style={{ marginVertical: 12 }}>
+                  <Carousel resData={trending.data} />
+                </View>
+              )
+            }
           />
         </View>
+
         {/* upcoming movies */}
         <View style={{ width: "100%" }}>
           <TitledMovieList
