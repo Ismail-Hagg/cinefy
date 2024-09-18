@@ -40,6 +40,8 @@ export const translation = {
     watchremove: "Remove from Watchlist",
     keepingadd: "Add to Keeping",
     trailer: "Watch Trailer",
+    wlist: "WatchList",
+    favs: "Favorites",
   },
   ar: {
     home: "الرئيسية",
@@ -82,5 +84,7 @@ export const translation = {
     keepingadd: "اضافة للمتابعة",
     watchremove: "حذف من قائمة المشاهدة",
     trailer: "مشاهدة الاعلان",
+    wlist: "قائمة المشاهدة",
+    favs: "المفضلات",
   },
 };

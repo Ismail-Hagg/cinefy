@@ -15,7 +15,7 @@ type props = {
   elevate?: number;
   radius?: number;
   noBorder?: boolean;
-  id: string;
+  id?: string;
 };
 
 const Movie = ({

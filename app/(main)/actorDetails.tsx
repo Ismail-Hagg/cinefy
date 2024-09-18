@@ -100,6 +100,16 @@ const actorDetails = () => {
           shw.push(item.id);
         }
       });
+      actMovies.sort(
+        (a, b) =>
+          Date.parse(b.release_date as string) -
+          Date.parse(a.release_date as string)
+      );
+      actShows.sort(
+        (a, b) =>
+          Date.parse(b.first_air_date as string) -
+          Date.parse(a.first_air_date as string)
+      );
     }
     if (data.combined_credits?.crew) {
       data.combined_credits.crew.map((item) => {

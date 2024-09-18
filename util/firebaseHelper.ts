@@ -1,4 +1,4 @@
-import firestore from "@react-native-firebase/firestore";
+import firestore, { Timestamp } from "@react-native-firebase/firestore";
 import { FirebsaePaths } from "./enums";
 import { Keeping, LocalUser, Results } from "./types";
 
@@ -56,13 +56,26 @@ export const addRecord = async (
     overview,
     poster_path,
   };
-  const pure = JSON.parse(JSON.stringify(sendOb));
+  let pure = JSON.parse(JSON.stringify(sendOb));
+  pure = { ...pure, time: Timestamp.now() };
 
   await usersCollection
     .doc(userId)
     .collection(path)
     .doc(movie.id.toString())
     .set(pure);
+};
+
+export const getRecord = async (
+  userId: string,
+  path: string,
+  ascend: boolean
+) => {
+  return await usersCollection
+    .doc(userId)
+    .collection(path)
+    .orderBy("time", ascend ? "asc" : "desc")
+    .get();
 };
 
 export const deleteRecodr = async (

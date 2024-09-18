@@ -802,7 +802,6 @@ const MovieDetailes = () => {
                       onEndEditing={(text) => {}}
                     />
                     <TouchableOpacity
-                      // onPress={fieldAction}
                       style={{
                         position: "absolute",
                         top: 0,
