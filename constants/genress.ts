@@ -108,4 +108,8 @@ export const genres = [
     id: 10768,
     name: "War & Politics",
   },
+  {
+    id: 0,
+    name: "Genre",
+  },
 ];

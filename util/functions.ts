@@ -25,6 +25,7 @@ export const pickImage = async () => {
   return result;
 };
 
+// call tmdb api
 export const apiCall = async (link: string) => {
   const options = {
     method: "GET",
@@ -71,15 +72,4 @@ export const getTimeDifferenceDescription = (date: Date): string => {
   } else {
     return date.toLocaleDateString();
   }
-};
-
-export const dateCheck = (date: string): boolean => {
-  // Parse the date string into a Date object
-  const parsed = new Date(date);
-
-  // Get the current date and time
-  const currentDate = new Date();
-
-  // Compare the date objects
-  return parsed < currentDate;
 };

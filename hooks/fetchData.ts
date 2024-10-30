@@ -6,5 +6,6 @@ export const useFetchData = (link: string, keys: (string | number)[]) => {
     queryKey: keys,
     queryFn: async () => await apiCall(link),
   });
+
   return fetch;
 };

@@ -36,24 +36,57 @@ export type Results = {
   title?: string;
   name?: string;
   vote_average: number;
-  status: string | null;
   media_type?: string;
-  number_of_seasons?: number;
-  runtime?: number;
-  origin_country: string[];
-  last_episode_to_air?: {
-    air_date: string;
-    episode_number: number;
-    season_number: number;
-  };
-  next_episode_to_air?: {
-    air_date: string;
-    episode_number: number;
-    season_number: number;
-  };
+  profile_path?: string;
 };
 
-export type BelongsToCollection = {
+export type Details = {
+  backdrop_path?: string;
+  belongs_to_collection?: BelongsToCollection;
+  genres: Genre[];
+  id: number;
+  origin_country: string[];
+  overview: string;
+  poster_path: string;
+  release_date?: string;
+  first_air_date?: string;
+  runtime?: number;
+  number_of_seasons?: number;
+  status?: string;
+  title?: string;
+  name?: string;
+  vote_average: number;
+  last_episode_to_air?: AirDate;
+  next_episode_to_air?: AirDate;
+  recommendations?: RootResult;
+  credits?: Credit;
+  images?: Images;
+  videos?: Vidoes;
+};
+
+type Vidoes = {
+  results: {
+    key: string;
+    site: string;
+    type: string;
+  }[];
+};
+
+type Images = {
+  posters: { file_path: string }[];
+};
+
+type Genre = {
+  id: number;
+  name: string;
+};
+type AirDate = {
+  air_date: string;
+  episode_number: number;
+  season_number: number;
+};
+
+type BelongsToCollection = {
   id: number;
   name: string;
   poster_path: string;
@@ -72,24 +105,8 @@ export type Cast = {
   character: string;
   credit_id: string;
 };
-export type Credit = {
+type Credit = {
   cast?: Cast[];
-};
-
-export type Info = {
-  belongs_to_collection?: BelongsToCollection;
-  credits?: Credit;
-  recommendations?: RootResult;
-  images?: {
-    posters: { file_path: string }[];
-  };
-  videos?: {
-    results: {
-      key: string;
-      site: string;
-      type: string;
-    }[];
-  };
 };
 
 export type CommentType = {
@@ -165,4 +182,20 @@ export type SearchPage = {
   results: (Results & Actor)[];
   link?: string;
   search: number;
+};
+
+export type Chat = {
+  change: Timestamp;
+  link: string;
+  unread: boolean;
+  token: string;
+  userId: string;
+  userName: string;
+  messages: Message[];
+};
+type Message = {
+  auther: string;
+  message: string;
+  createdAt: Timestamp;
+  id: string;
 };
