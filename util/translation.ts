@@ -49,6 +49,8 @@ export const translation = {
     char: "Character",
     unknown: "Unknown",
     optioins: "Options",
+    saveerror: "Error Saving User Data",
+    searchmessage: "Search for Movie , Show , People",
   },
   ar: {
     home: "الرئيسية",
@@ -100,5 +102,7 @@ export const translation = {
     char: "الشخصية",
     unknown: "غير معروف",
     optioins: "خيارات",
+    saveerror: "خطأ في حفظ البيانات",
+    searchmessage: "ابحث عن افلام، المسلسلات، و الممثلين",
   },
 };

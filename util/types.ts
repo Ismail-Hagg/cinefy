@@ -7,7 +7,7 @@ export type LocalUser = {
   phoneNumber: string;
   localPic: string;
   onlinePic: string;
-  language: string;
+  language: "ar" | "en";
   messagingToken: string;
   watchList: string[];
   favs: string[];
@@ -138,7 +138,7 @@ export type Episode = {
   vote_average: number;
 };
 
-export type Keeping = {
+export type EpKeeping = {
   change: Timestamp;
   isUpdated: boolean;
   name: string;
