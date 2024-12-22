@@ -1,4 +1,4 @@
-package com.anonymous.cinefy
+package com.alltech.cinefy
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

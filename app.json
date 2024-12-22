@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.cinefy"
+      "package": "com.alltech.cinefy",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",

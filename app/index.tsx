@@ -1,6 +1,8 @@
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import firestore, { firebase } from "@react-native-firebase/firestore";
 
 export default function Index() {
+
   return (
     <View
       style={{

@@ -1,4 +1,4 @@
-package com.anonymous.cinefy
+package com.alltech.cinefy
 
 import android.app.Application
 import android.content.res.Configuration
